@@ -16,6 +16,7 @@ const app = {
         this.renderAll();
         this.renderOnlineLink();
         this.renderGallery();
+        this.renderSchoolInfo();
         this.initInstall();
         
         if ('serviceWorker' in navigator) {
@@ -314,6 +315,33 @@ const app = {
             div.innerHTML = `<img src="${img.src}" style="width:100%;"><p style="font-size: 0.8rem;">${img.event} (${img.date})</p>`;
             container.appendChild(div);
         });
+    },
+
+    saveSchoolSettings() {
+        this.data.settings.school_name = document.getElementById('set_school_name').value;
+        this.data.settings.school_address = document.getElementById('set_school_address').value;
+        this.data.settings.school_phone = document.getElementById('set_school_phone').value;
+        this.data.settings.principal_name = document.getElementById('set_principal_name').value;
+        
+        this.saveData('settings');
+        this.renderSchoolInfo();
+        alert('Settings Saved Successfully!');
+    },
+
+    renderSchoolInfo() {
+        const s = this.data.settings;
+        document.getElementById('disp_school_name').innerText = s.school_name || 'Welcome to Dhaham Pasala';
+        document.getElementById('disp_school_address').innerText = s.school_address || '';
+        document.getElementById('disp_school_phone').innerText = s.school_phone ? 'Tel: ' + s.school_phone : '';
+        document.getElementById('disp_principal_name').innerText = s.principal_name ? 'Principal: ' + s.principal_name : '';
+        
+        // Populate inputs if in settings
+        if (document.getElementById('set_school_name')) {
+            document.getElementById('set_school_name').value = s.school_name || '';
+            document.getElementById('set_school_address').value = s.school_address || '';
+            document.getElementById('set_school_phone').value = s.school_phone || '';
+            document.getElementById('set_principal_name').value = s.principal_name || '';
+        }
     },
 
     // --- Leader Management ---
