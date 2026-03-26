@@ -56,8 +56,13 @@
             
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2>Welcome to Dhaham Pasala</h2>
+                    <h2 id="disp_school_name">Welcome to Dhaham Pasala</h2>
                     <div class="schedule">7:30 AM - 12:00 PM</div>
+                </div>
+                <div id="schoolInfoDisplay" style="margin: 10px 0; font-size: 0.9rem; color: #666; border-left: 3px solid var(--accent); padding-left: 10px;">
+                    <p id="disp_school_address"></p>
+                    <p id="disp_school_phone"></p>
+                    <p id="disp_principal_name" style="font-weight: 700; color: var(--primary);"></p>
                 </div>
                 <p>Manage Students, Teachers, and Classroom activities with ease. Use the sidebar to navigate.</p>
                 <div id="rolePicker" style="margin-top: 2rem; display: flex; gap: 10px; flex-wrap: wrap;">
@@ -265,6 +270,30 @@
                 <div class="gallery" id="galleryContainer">
                     <!-- Photos injected by JS -->
                 </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="section">
+            <div class="card">
+                <h2>School Settings</h2>
+                <div class="form-group">
+                    <label>Dhaham Pasala Name</label>
+                    <input type="text" id="set_school_name">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="set_school_address"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" id="set_school_phone">
+                </div>
+                <div class="form-group">
+                    <label>Principal's Name</label>
+                    <input type="text" id="set_principal_name">
+                </div>
+                <button class="btn btn-primary" onclick="app.saveSchoolSettings()">Save Settings</button>
             </div>
         </section>
 
