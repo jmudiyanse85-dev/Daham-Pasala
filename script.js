@@ -6,7 +6,8 @@ const app = {
         notices: JSON.parse(localStorage.getItem('dp_notices')) || [],
         gallery: JSON.parse(localStorage.getItem('dp_gallery')) || [],
         leaderPoints: JSON.parse(localStorage.getItem('dp_leader_pts')) || {},
-        settings: JSON.parse(localStorage.getItem('dp_settings')) || { logo: 'logo.png' }
+        settings: JSON.parse(localStorage.getItem('dp_settings')) || { logo: 'logo.png' },
+        pins: { admin: '1111', principal: '2222', teacher: '3333', 'mal-bhara': '4444' }
     },
 
     init() {
@@ -82,6 +83,32 @@ const app = {
     },
 
     setRole(role) {
+        if (role === 'student') {
+            this.applyRole(role);
+            return;
+        }
+
+        // Show PIN modal for protected roles
+        this.pendingRole = role;
+        document.getElementById('loginTitle').innerText = role.toUpperCase();
+        document.getElementById('loginModal').style.display = 'block';
+        document.getElementById('overlay').classList.add('active');
+        document.getElementById('rolePinInput').value = '';
+        document.getElementById('rolePinInput').focus();
+
+        document.getElementById('verifyPinBtn').onclick = () => {
+            const entered = document.getElementById('rolePinInput').value;
+            if (entered === this.data.pins[role]) {
+                this.applyRole(role);
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('overlay').classList.remove('active');
+            } else {
+                alert('Invalid PIN!');
+            }
+        };
+    },
+
+    applyRole(role) {
         this.role = role;
         this.currentRoleSpan.innerText = role.toUpperCase();
         document.body.className = 'role-' + role;
@@ -91,14 +118,18 @@ const app = {
             'adminNoticeControl': ['admin', 'principal', 'teacher'],
             'leaderSelectionForm': ['admin', 'principal'],
             'galleryUpload': ['admin'],
-            'teacherOnlineControl': ['admin', 'teacher']
+            'teacherOnlineControl': ['admin', 'teacher'],
+            'addStudentBtn': ['admin', 'teacher']
         };
 
         for (const [id, roles] of Object.entries(controls)) {
             const element = document.getElementById(id);
-            if (element) element.style.display = (roles.includes(role) || role === 'admin') ? 'block' : 'none';
+            if (element) {
+                element.style.display = (roles.includes(role) || role === 'admin') ? 'inline-block' : 'none';
+            }
         }
-
+        
+        this.renderStudents(); // Re-render to show/hide action buttons
         alert(`Logged in as ${role}`);
     },
 
@@ -144,6 +175,8 @@ const app = {
 
     renderStudents() {
         this.studentsTable.innerHTML = '';
+        const canEdit = (this.role !== 'student');
+        
         this.data.students.sort((a,b) => a.class - b.class).forEach(s => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -152,12 +185,12 @@ const app = {
                 <td>${s.parent_whatsapp}</td>
                 <td><a href="https://wa.me/${s.parent_whatsapp}" target="_blank" style="color: #25d366;"><i class="fab fa-whatsapp"></i> Chat</a></td>
                 <td>
-                    <button class="btn" style="background: ${s.absent ? '#ff5252' : '#4caf50'}; color: white;" onclick="app.toggleAttendance(${s.id})">
+                    <button class="btn" ${canEdit ? '' : 'disabled'} style="background: ${s.absent ? '#ff5252' : '#4caf50'}; color: white;" onclick="app.toggleAttendance(${s.id})">
                         ${s.absent ? 'Absent' : 'Present'}
                     </button>
                 </td>
                 <td>
-                    <button class="btn btn-primary" onclick="app.deleteStudent(${s.id})"><i class="fas fa-trash"></i></button>
+                    ${canEdit ? `<button class="btn btn-primary" onclick="app.deleteStudent(${s.id})"><i class="fas fa-trash"></i></button>` : 'Read Only'}
                 </td>
             `;
             this.studentsTable.appendChild(tr);
@@ -336,13 +369,14 @@ const app = {
         this.scoresTable.innerHTML = '';
         if (!cls) return;
 
+        const canEdit = (this.role !== 'student');
         const students = this.data.students.filter(s => s.class === cls);
         students.forEach(s => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${s.name}</td>
-                <td><input type="number" value="${s.points_mal || 0}" max="10" onchange="app.updateStudentPoints(${s.id}, 'mal', this.value)"></td>
-                <td><input type="number" value="${s.points_gilan || 0}" max="10" onchange="app.updateStudentPoints(${s.id}, 'gilan', this.value)"></td>
+                <td><input type="number" ${canEdit ? '' : 'disabled'} value="${s.points_mal || 0}" max="10" onchange="app.updateStudentPoints(${s.id}, 'mal', this.value)"></td>
+                <td><input type="number" ${canEdit ? '' : 'disabled'} value="${s.points_gilan || 0}" max="10" onchange="app.updateStudentPoints(${s.id}, 'gilan', this.value)"></td>
                 <td>-</td>
             `;
             this.scoresTable.appendChild(tr);

@@ -315,6 +315,19 @@
         </div>
     </div>
 
+    <!-- PIN Login Modal -->
+    <div id="loginModal" class="card" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3000; width: 300px;">
+        <h3>Login - <span id="loginTitle">Role</span></h3>
+        <div class="form-group" style="margin-top: 15px;">
+            <label>Security PIN</label>
+            <input type="password" id="rolePinInput" placeholder="Enter PIN">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" id="verifyPinBtn">Login</button>
+            <button class="btn" onclick="document.getElementById('loginModal').style.display='none'; document.getElementById('overlay').classList.remove('active');">Cancel</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
